@@ -7,8 +7,6 @@
 #include <Eigen/Dense>
 #include <cmath>
 #include <iostream>
-#include <pinocchio/geometry/data.hpp>
-#include <pinocchio/geometry/model.hpp>
 #include <pinocchio/multibody/data.hpp>
 #include <pinocchio/multibody/model.hpp>
 #include <random>

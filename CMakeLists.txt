@@ -10,6 +10,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # 找到Pinocchio和Eigen3
 find_package(pinocchio REQUIRED)
+# 打印pinocchio_LIBRARIES的值
+message(STATUS "Pinocchio Libraries: ${pinocchio_LIBRARIES}")
 find_package(Eigen3 REQUIRED)
 
 # 设置hpp-fcl的自定义路径

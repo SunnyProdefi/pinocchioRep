@@ -110,9 +110,7 @@ void printGeometrySizes(const pinocchio::GeometryModel &geom_model) {
       std::cout << "Type: Cone" << std::endl;
       std::cout << "Radius: " << cone->radius
                 << ", Height: " << cone->halfLength << std::endl;
-    } else if (auto bvhModel =
-                   dynamic_cast<hpp::fcl::BVHModel<hpp::fcl::OBBRSS> *>(
-                       shape.get())) {
+    } else if (auto bvhModel = dynamic_cast<hpp::fcl::BVHModelBase *>(shape.get())) {
       bvhModel->computeLocalAABB();
       std::cout << "Type: BVHModel" << std::endl;
       std::cout << "Number of vertices: " << bvhModel->num_vertices

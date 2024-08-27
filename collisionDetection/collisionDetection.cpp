@@ -70,9 +70,9 @@ int main(int /*argc*/, char ** /*argv*/) {
     const CollisionPair &cp = geom_model.collisionPairs[k];
     const hpp::fcl::CollisionResult &cr = geom_data.collisionResults[k];
 
-    std::cout << "collision pair: " << cp.first << " , " << cp.second
-              << " - collision: ";
-    std::cout << (cr.isCollision() ? "yes" : "no") << std::endl;
+    // std::cout << "collision pair: " << cp.first << " , " << cp.second
+    //           << " - collision: ";
+    // std::cout << (cr.isCollision() ? "yes" : "no") << std::endl;
   }
 
   return 0;

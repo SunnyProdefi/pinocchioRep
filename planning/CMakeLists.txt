@@ -4,6 +4,9 @@ add_executable(dualArmRRT dualArmRRT.cpp ../robotModel/robot_model.cpp ../math/B
 target_link_libraries(dualArmRRT 
     ${OMPL_LIBRARIES}  
     ${pinocchio_LIBRARIES}
+    /opt/openrobots/lib/libpinocchio_default.so 
+    /opt/openrobots/lib/libpinocchio_collision.so 
+    /opt/openrobots/lib/libpinocchio_parsers.so 
     ${EIGEN3_LIBRARIES}
     ${HPP_FCL_LIB}
 )

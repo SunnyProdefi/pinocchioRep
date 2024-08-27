@@ -16,6 +16,7 @@
 #include <pinocchio/fwd.hpp>
 #include <pinocchio/multibody/data.hpp>
 #include <pinocchio/multibody/model.hpp>
+#include <hpp/fcl/BVH/BVH_model.h>
 
 #ifndef PINOCCHIO_MODEL_DIR
 #define PINOCCHIO_MODEL_DIR "/home/prodefi/pinocchioDep/"

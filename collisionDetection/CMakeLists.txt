@@ -4,6 +4,9 @@ add_executable(collisionDetection collisionDetection.cpp)
 # 链接库
 target_link_libraries(collisionDetection
   ${pinocchio_LIBRARIES}
+  /opt/openrobots/lib/libpinocchio_default.so 
+  /opt/openrobots/lib/libpinocchio_collision.so 
+  /opt/openrobots/lib/libpinocchio_parsers.so 
   ${EIGEN3_LIBRARIES}
   ${HPP_FCL_LIB}
   ${urdfdom_LIBRARIES}

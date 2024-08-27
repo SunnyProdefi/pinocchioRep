@@ -1,13 +1,20 @@
-#include "math/BSplineInterpolator.h"
-#include "robotModel/robot_model.h"
-#include <Eigen/Dense>
-#include <cmath>
-#include <iostream>
 #include <ompl/base/SpaceInformation.h>
+#include <ompl/base/State.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
+
+#include <Eigen/Dense>
+#include <cmath>
+#include <iostream>
+#include <pinocchio/geometry/data.hpp>
+#include <pinocchio/geometry/model.hpp>
+#include <pinocchio/multibody/data.hpp>
+#include <pinocchio/multibody/model.hpp>
 #include <random>
+
+#include "math/BSplineInterpolator.h"
+#include "robotModel/robot_model.h"
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
@@ -16,11 +23,11 @@ extern pinocchio::Model model;
 extern pinocchio::Data data;
 extern pinocchio::GeometryModel geom_model;
 extern pinocchio::GeometryData geom_data;
-Eigen::MatrixXd pathPoints; // 全局矩阵，未初始化大小
+Eigen::MatrixXd pathPoints;  // 全局矩阵，未初始化大小
 // Modified state validity checker to include collision detection
 bool isStateValid(const ob::State *state) {
   const auto *realState = state->as<ob::RealVectorStateSpace::StateType>();
-  Eigen::VectorXd q_total(28); // 机器人完整的自由度
+  Eigen::VectorXd q_total(28);  // 机器人完整的自由度
 
   // 将所有自由度设置为初始位置
   q_total = q_init_;
@@ -31,7 +38,7 @@ bool isStateValid(const ob::State *state) {
     q_total[i] = realState->values[i - 15];
   }
   for (size_t i = 22; i < 28; ++i) {
-    q_total[i] = realState->values[i - 16]; // 因为只有12个活动自由度
+    q_total[i] = realState->values[i - 16];  // 因为只有12个活动自由度
   }
 
   // 使用CollisionCheck进行碰撞检测
@@ -40,10 +47,10 @@ bool isStateValid(const ob::State *state) {
 
   if (hasCollision) {
     std::cout << "Collision detected" << std::endl;
-    return false; // 如果发生碰撞，则状态无效
+    return false;  // 如果发生碰撞，则状态无效
   } else {
     std::cout << "No collision detected" << std::endl;
-    return true; // 如果无碰撞，状态有效
+    return true;  // 如果无碰撞，状态有效
   }
 }
 
@@ -51,7 +58,7 @@ void planWithRRT(const Eigen::VectorXd &q_init, const Eigen::VectorXd &q_goal,
                  const Eigen::VectorXd &lower_limits,
                  const Eigen::VectorXd &upper_limits) {
   auto space = std::make_shared<ob::RealVectorStateSpace>(
-      12); // Use the correct number of DOF
+      12);  // Use the correct number of DOF
 
   ob::RealVectorBounds bounds(12);
   for (size_t i = 0; i < 12; ++i) {
@@ -70,11 +77,11 @@ void planWithRRT(const Eigen::VectorXd &q_init, const Eigen::VectorXd &q_goal,
 
   ob::ScopedState<> start(space);
   ob::ScopedState<> goal(space);
-  //使用q_init作为初始状态
+  // 使用q_init作为初始状态
   for (size_t i = 0; i < 12; ++i) {
     start[i] = q_init[i];
   }
-  //使用q_goal作为目标状态
+  // 使用q_goal作为目标状态
   for (size_t i = 0; i < 12; ++i) {
     goal[i] = q_goal[i];
   }
@@ -84,7 +91,7 @@ void planWithRRT(const Eigen::VectorXd &q_init, const Eigen::VectorXd &q_goal,
 
   auto planner = std::make_shared<og::RRTConnect>(si);
   planner->setProblemDefinition(pdef);
-  planner->setRange(0.1); // 将步长设置为0.1
+  planner->setRange(0.1);  // 将步长设置为0.1
   planner->setup();
 
   ob::PlannerStatus solved = planner->ob::Planner::solve(5.0);
@@ -127,13 +134,13 @@ void planWithRRT(const Eigen::VectorXd &q_init, const Eigen::VectorXd &q_goal,
 // 设置q_goal，使其在关节限制内随机
 void setQGoal(Eigen::VectorXd &q_goal, const Eigen::VectorXd &lower_limits,
               const Eigen::VectorXd &upper_limits) {
-  std::random_device rd;  // 随机数生成器设备
-  std::mt19937 gen(rd()); // 标准 mersenne_twister_engine
-  q_goal.resize(12);      // 确保q_goal有正确的大小
+  std::random_device rd;   // 随机数生成器设备
+  std::mt19937 gen(rd());  // 标准 mersenne_twister_engine
+  q_goal.resize(12);       // 确保q_goal有正确的大小
 
   for (size_t i = 0; i < 12; ++i) {
     std::uniform_real_distribution<> dis(lower_limits[i], upper_limits[i]);
-    q_goal[i] = dis(gen); // 生成一个在给定范围内的随机数
+    q_goal[i] = dis(gen);  // 生成一个在给定范围内的随机数
   }
 }
 
@@ -146,7 +153,7 @@ inline double degreesToRadians(double degrees) {
 void setQGoal(Eigen::VectorXd &q_goal, const Eigen::VectorXd &angles_degrees,
               const Eigen::VectorXd &lower_limits,
               const Eigen::VectorXd &upper_limits) {
-  q_goal.resize(12); // 确保q_goal有正确的大小
+  q_goal.resize(12);  // 确保q_goal有正确的大小
   for (size_t i = 0; i < 12; ++i) {
     double rad_angle = degreesToRadians(angles_degrees[i]);
 
@@ -156,24 +163,24 @@ void setQGoal(Eigen::VectorXd &q_goal, const Eigen::VectorXd &angles_degrees,
                 << " degrees (Limits: " << lower_limits[i] << " to "
                 << upper_limits[i] << " degrees)." << std::endl;
     } else {
-      q_goal[i] = rad_angle; // 直接赋值已转换的弧度
+      q_goal[i] = rad_angle;  // 直接赋值已转换的弧度
     }
   }
 }
 
 int main(int argc, char **argv) {
-  setupAndSimulateRobot(); // Initialize robot model
+  setupAndSimulateRobot();  // Initialize robot model
   printGeometryIDs(geom_model);
   printGeometrySizes(geom_model);
   std::cout << "Robot model initialized" << std::endl;
   std::cout << "Robot model has " << model.nq << " DOF" << std::endl;
-  //关节角度上下限
+  // 关节角度上下限
   std::cout << "Joint limits: " << model.lowerPositionLimit.transpose()
             << std::endl
             << model.upperPositionLimit.transpose() << std::endl;
   // 提取并显示特定关节的位置限制
-  Eigen::VectorXd lower_limits(12); // 存储所需关节的下限
-  Eigen::VectorXd upper_limits(12); // 存储所需关节的上限
+  Eigen::VectorXd lower_limits(12);  // 存储所需关节的下限
+  Eigen::VectorXd upper_limits(12);  // 存储所需关节的上限
 
   // 提取第14到20个关节的位置限制
   lower_limits.head(6) = model.lowerPositionLimit.segment(15, 6);
@@ -213,10 +220,10 @@ int main(int argc, char **argv) {
   }
   std::cout << "Path points matrix size: " << pathPoints.rows() << " x "
             << pathPoints.cols() << std::endl;
-  //将路径点写入pathPoints.csv文件
+  // 将路径点写入pathPoints.csv文件
   std::ofstream file("../../planning/pathPoints.csv");
   if (file.is_open()) {
-    //每列开头为join1-joint12
+    // 每列开头为join1-joint12
     for (size_t i = 0; i < 12; ++i) {
       file << "joint" << i + 1;
       if (i < 11) {
@@ -245,14 +252,14 @@ int main(int argc, char **argv) {
   // 打印插值点
   std::cout << "Interpolated points:" << interpolated_points.size()
             << std::endl;
-  //按列打印插值点
+  // 按列打印插值点
   for (size_t i = 0; i < interpolated_points.size(); ++i) {
     std::cout << interpolated_points[i].transpose() << std::endl;
   }
   // 将插值点写入interpolatedPoints.csv文件
   std::ofstream file2("../../planning/interpolatedPoints.csv");
   if (file2.is_open()) {
-    //每列开头为join1-joint12
+    // 每列开头为join1-joint12
     for (size_t i = 0; i < 12; ++i) {
       file2 << "joint" << i + 1;
       if (i < 11) {
